@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script src="pomelo-client.js"></script>
+		<script>
+		 pomelo.init({'host':'192.168.144.244','port':3010 },function(){
+		 	pomelo.request('connector.entryHandler.entry', {'a':1},function(data){console.log('receive %j',data);});
+		 });
+		</script>
+  </head>
+  <body>
+  </body>
+</html>

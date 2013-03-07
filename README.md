@@ -1,9 +1,11 @@
-#Pomelo javascript client
+#Pomelo javascript websocket client
 
-The javascript client libary for [Pomelo](https://github.com/NetEase/pomelo) 
-this javascript client based on original websocket not [socket.io](https://github.com/LearnBoost/socket.io-client) so it supports binary transfer  
-we use a new [protocol](https://github.com/NetEase/pomelo/wiki/Pomelo-%E5%8D%8F%E8%AE%AE) to communicate between server and client , and this client supports it   
-for server you should use pomelo version 0.3 to support the new protocol and commnuicate with this client  
+The javascript websocket client library for [Pomelo](https://github.com/NetEase/pomelo).
+Since there are two kind connectors in pomelo 0.3, socket.io and socket(websocket), we provide two javascript clients for different usage.
+[websocket client](https://github.com/pomelonode/pomelo-jsclient-websocket) is optimized for data transfer size, the package is compressedin high rate. It's suitable for HTML5 online game, especially mobile platform.
+[socket.io client](https://github.com/pomelonode/pomelo-jsclient-socket.io) is excellent for browser compatibility, the package is in json. It's suitable for online realtime application on browser, like chat, on which browser compatiblity is an important issue.
+
+The apis are almost the same in both clients, except websocket client need a handshake callback for protocol data.
 
 ##Usage
 

@@ -1,28 +1,36 @@
 #Pomelo javascript client
 
-The javascript client libary for [Pomelo](https://github.com/NetEase/pomelo)
-
+The javascript client libary for [Pomelo](https://github.com/NetEase/pomelo) 
+this javascript client based on original websocket not [socket.io](https://github.com/LearnBoost/socket.io-client)  
+so it supports binary transfer  
+we use a new [protocol](https://github.com/NetEase/pomelo/wiki/Pomelo-%E5%8D%8F%E8%AE%AE) to communicate between server and client , and this client supports it   
 
 ##Usage
 
 ### connect to the server
 ``` javascript
   pomelo.init(params, callback);
-```
+```  
+params object are 
+
 example:
 ``` javascript
   pomelo.init({
     host: host,
     port: port,
-    log: true
+    user: {},
+    handshakeCallback : function(){}
   }, function() {
     console.log('success');
   });
 ```
 
+user field is user define json content  
+handshakeCallback field is handshake callback function  
+
 ### send request to server with callback
 ``` javascript
-  pomelo.request(route, params, callback);
+  pomelo.request(route, msg, callback);
 ```
 
 example:
@@ -52,6 +60,10 @@ example:
 	});
 ```
 
+### disconnect from server  
+``` javascript
+pomelo.disconnect();
+```  
 
 ##License
 (The MIT License)

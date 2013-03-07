@@ -1,8 +1,10 @@
 #Pomelo javascript websocket client
 
 The javascript websocket client library for [Pomelo](https://github.com/NetEase/pomelo).
+
 Since there are two kind connectors in pomelo 0.3, socket.io and socket(websocket), we provide two javascript clients for different usage.
 [websocket client](https://github.com/pomelonode/pomelo-jsclient-websocket) is optimized for data transfer size, the package is compressedin high rate. It's suitable for HTML5 online game, especially mobile platform.
+
 [socket.io client](https://github.com/pomelonode/pomelo-jsclient-socket.io) is excellent for browser compatibility, the package is in json. It's suitable for online realtime application on browser, like chat, on which browser compatiblity is an important issue.
 
 The apis are almost the same in both clients, except websocket client need a handshake callback for protocol data.

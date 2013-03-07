@@ -1,8 +1,7 @@
 #Pomelo javascript client
 
 The javascript client libary for [Pomelo](https://github.com/NetEase/pomelo) 
-this javascript client based on original websocket not [socket.io](https://github.com/LearnBoost/socket.io-client)  
-so it supports binary transfer  
+this javascript client based on original websocket not [socket.io](https://github.com/LearnBoost/socket.io-client) so it supports binary transfer  
 we use a new [protocol](https://github.com/NetEase/pomelo/wiki/Pomelo-%E5%8D%8F%E8%AE%AE) to communicate between server and client , and this client supports it   
 
 ##Usage

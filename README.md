@@ -6,6 +6,7 @@ Since there are two kind connectors in pomelo 0.3, socket.io and socket(websocke
 [socket.io client](https://github.com/pomelonode/pomelo-jsclient-socket.io) is excellent for browser compatibility, the package is in json. It's suitable for online realtime application on browser, like chat, on which browser compatiblity is an important issue.
 
 The apis are almost the same in both clients, except websocket client need a handshake callback for protocol data.
+Both clients use [component](https://github.com/component/component/) package manager for building.
 
 ##Usage
 

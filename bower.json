@@ -1,0 +1,24 @@
+{
+  "name": "pomelo-jsclient-websocket",
+  "version": "0.1.1",
+  "homepage": "https://github.com/pomelonode/pomelo-jsclient-websocket",
+  "authors": [
+    "fantasyni"
+  ],
+  "description": "pomelo jsclient for browser websocket",
+  "main": "build/pomelo-wsclient.js",
+  "moduleType": [],
+  "keywords": [
+    "pomelo",
+    "jsclient",
+    "websocket"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}

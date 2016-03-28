@@ -1,7 +1,3 @@
-if(typeof window === 'undefined') {
-    global.window = {};
-}
-
 var Emitter = require('component-emitter');
 window.EventEmitter = Emitter;
 
@@ -13,7 +9,3 @@ window.protobuf = protobuf;
 
 var pomelo = require('../lib/pomelo-client');
 window.pomelo = pomelo;
-
-if (typeof module !== 'undefined') {
-    module.exports = pomelo;
-}

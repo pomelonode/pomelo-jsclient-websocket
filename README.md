@@ -70,6 +70,13 @@ example:
 pomelo.disconnect();
 ```  
 
+##Build
+1. Install all dependencies:
+`npm install`
+
+2. Generate the bundle:
+`npm run build`
+
 ##License
 (The MIT License)
 

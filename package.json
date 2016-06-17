@@ -19,9 +19,11 @@
     "component-emitter": "^1.2.0",
     "pomelo-protobuf": "^0.4.0",
     "pomelo-protocol": "^0.1.6",
+    "q": "^1.4.1",
     "uglify-js": "^2.6.2"
   },
   "scripts": {
-    "build": "browserify src/main.js > build/pomelo-wsclient.js & browserify src/main.js | uglifyjs > build/pomelo-wsclient.min.js"
-  }
+    "build": "browserify src/pomelo-client.js > build/pomelo-wsclient.js & browserify src/pomelo-client.js | uglifyjs > build/pomelo-wsclient.min.js"
+  },
+  "dependencies": {}
 }

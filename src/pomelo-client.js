@@ -1,5 +1,5 @@
 (function () {
-  var root = typeof(window) !== 'undefined' ? window : {};
+  var root = typeof(window) !== 'undefined' ? window : global;
 
   var JS_WS_CLIENT_TYPE = 'js-websocket';
   var JS_WS_CLIENT_VERSION = '0.0.1';
@@ -14,6 +14,7 @@
   var EventEmitter = require('component-emitter');
   var rsa = rsa = root.rsa;
   var q = require('q');
+  var WebSocket = root.WebSocket;
 
   if(typeof (sys) != 'undefined' && sys.localStorage) {
     root.localStorage = sys.localStorage;
@@ -38,9 +39,9 @@
     this.callbacks = {};
     this.handlers = {};
     this.handlers[Package.TYPE_HANDSHAKE] = this.handshake.bind(this);
-    this.handlers[Package.TYPE_HEARTBEAT] = this.handshake.bind(this);
-    this.handlers[Package.TYPE_DATA] = this.handshake.bind(this);
-    this.handlers[Package.TYPE_KICK] = this.handshake.bind(this);
+    this.handlers[Package.TYPE_HEARTBEAT] = this.heartbeat.bind(this);
+    this.handlers[Package.TYPE_DATA] = this.onData.bind(this);
+    this.handlers[Package.TYPE_KICK] = this.onKick.bind(this);
     //Map from request id to route
     this.routeMap = {};
     this.dict = {};    // route string to code
@@ -56,9 +57,6 @@
     this.heartbeatId = null;
     this.heartbeatTimeoutId = null;
     this.handshakeCallback = null;
-
-    this.decode = null;
-    this.encode = null;
 
     this.reconnect = false;
     this.reconncetTimer = null;
@@ -79,7 +77,7 @@
       }
     };
 
-    this.initCallback = null;
+    this.initDeferred = null;
   };
   // inherit EventEmitter prototype
   pomeloClient.prototype = Object.create(EventEmitter.prototype);
@@ -87,7 +85,7 @@
   pomeloClient.prototype.constructor = pomeloClient;
 
   pomeloClient.prototype.init = function (params, cb) {
-    this.initCallback = cb;
+    this.initDeferred = q.defer();
     var host = params.host;
     var port = params.port;
 
@@ -110,7 +108,9 @@
       this.handshakeBuffer.sys.rsa = data;
     }
     this.handshakeCallback = params.handshakeCallback;
-    return this.connect(params, url, cb);
+    this.connect(params, url);
+    this.initDeferred.promise.done(cb || function() {}); // old api compatibility
+    return this.initDeferred.promise;
   };
 
   pomeloClient.prototype.decode = function (data) {
@@ -151,11 +151,7 @@
     return Message.encode(reqId, type, compressRoute, route, msg);
   };
 
-  pomeloClient.prototype.connect = function (params, url, callback) {
-    var deferred = q.defer();
-    var promise = deferred.promise;
-    callback = qWrap(callback, deferred);
-
+  pomeloClient.prototype.connect = function (params, url) {
     var params = params || {};
     var maxReconnectAttempts = params.maxReconnectAttempts || this.DEFAULT_MAX_RECONNECT_ATTEMPTS;
     this.reconnectUrl = url;
@@ -176,7 +172,7 @@
       }
     }
     //Set protoversion
-    this.handshakeBuffer.sys.protoVersion = protoVersion;
+    this.handshakeBuffer.sys.protoVersion = this.protoVersion;
 
     var onopen = function (event) {
       if (!!this.reconnect) {
@@ -187,7 +183,7 @@
       this.send(obj);
     };
     var onmessage = function (event) {
-      this.processPackage(Package.decode(event.data), callback);
+      this.processPackage(Package.decode(event.data));
       // new package arrived, update the heartbeat timeout
       if (this.heartbeatTimeout) {
         this.nextHeartbeatTimeout = Date.now() + this.heartbeatTimeout;
@@ -195,9 +191,7 @@
     };
     var onerror = function (event) {
       this.emit('io-error', event);
-      if(promise.isPending()) {
-        deferred.reject(event);
-      }
+      this.initDeferred.reject(event);
     };
     var onclose = function (event) {
       this.emit('close', event);
@@ -206,18 +200,17 @@
         this.reconnect = true;
         this.reconnectAttempts++;
         this.reconncetTimer = setTimeout(function () {
-          this.connect(params, this.reconnectUrl, callback);
+          this.connect(params, this.reconnectUrl);
         }.bind(this), this.reconnectionDelay);
         this.reconnectionDelay *= 2;
       }
     };
     this.socket = new WebSocket(url);
     this.socket.binaryType = 'arraybuffer';
-    this.socket.onopen = onopen;
-    this.socket.onmessage = onmessage;
-    this.socket.onerror = onerror;
-    this.socket.onclose = onclose;
-    return promise;
+    this.socket.onopen = onopen.bind(this);
+    this.socket.onmessage = onmessage.bind(this);
+    this.socket.onerror = onerror.bind(this);
+    this.socket.onclose = onclose.bind(this);
   };
 
   pomeloClient.prototype.disconnect = function () {
@@ -250,7 +243,7 @@
     if (arguments.length === 2 && typeof msg === 'function') {
       cb = qWrap(msg, deferred);
       msg = {};
-    } else if(arguments.length === 2) { 
+    } else if(!cb) { 
       cb = deferred.resolve;
     }
     msg = msg || {};
@@ -262,8 +255,9 @@
     this.reqId++;
     this.sendMessage(this.reqId, route, msg);
 
-    this.callbacks[this.reqId] = cb.bind(this);
+    this.callbacks[this.reqId] = cb;
     this.routeMap[this.reqId] = route;
+    return deferred.promise;
   };
 
   pomeloClient.prototype.notify = function (route, msg) {
@@ -288,7 +282,7 @@
   };
 
   pomeloClient.prototype.send = function (packet) {
-    if (this.socket)
+    if (this.socket && this.socket.readyState === this.socket.OPEN)
       this.socket.send(packet.buffer);
   };
 
@@ -343,9 +337,7 @@
 
     var obj = Package.encode(Package.TYPE_HANDSHAKE_ACK);
     this.send(obj);
-    if (this.initCallback) {
-      this.initCallback(socket);
-    }
+    this.initDeferred.resolve(data);
   };
 
   pomeloClient.prototype.onData = function (data) {
@@ -382,7 +374,7 @@
     //if have a id then find the callback function with the request
     var cb = this.callbacks[msg.id];
 
-    delete callbacks[msg.id];
+    delete this.callbacks[msg.id];
     if (typeof cb !== 'function') {
       return;
     }

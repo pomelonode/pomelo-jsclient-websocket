@@ -23,7 +23,7 @@
     "uglify-js": "^2.6.2"
   },
   "scripts": {
-    "build": "browserify src/pomelo-client.js > build/pomelo-wsclient.js & browserify src/pomelo-client.js | uglifyjs > build/pomelo-wsclient.min.js"
+    "build": "browserify src/pomelo-client.js --standalone pomeloClient > build/pomelo-wsclient.js & browserify src/pomelo-client.js --standalone pomeloClient | uglifyjs > build/pomelo-wsclient.min.js"
   },
   "dependencies": {}
 }

@@ -2,31 +2,34 @@
 
 The javascript websocket client library for [Pomelo](https://github.com/NetEase/pomelo).
 
-Since there are two kind connectors in pomelo 0.3, socket.io and socket(websocket), we provide two javascript clients for different usage.
-[websocket client](https://github.com/pomelonode/pomelo-jsclient-websocket) is optimized for data transfer size, the package is compressedin high rate. It's suitable for HTML5 online game, especially mobile platform.
-
-[socket.io client](https://github.com/pomelonode/pomelo-jsclient-socket.io) is excellent for browser compatibility, the package is in json. It's suitable for online realtime application on browser, like chat, on which browser compatiblity is an important issue.
-
-The apis are almost the same in both clients, except websocket client need a handshake callback for protocol data.
-Both clients use [component](https://github.com/component/component/) package manager for building.
+This pomelo client library is essentially identical to https://github.com/pomelonode/pomelo-jsclient-websocket, but some additional features to enable nodejs/browser compatibility, object instantiation and promises were added.
 
 ##Usage
+### nodejs/browser setup
+- In order to setup this pomelo client with nodejs its necessary define a global.WebSocket, and WebSocket must follow the WebSockets API. Setup example using https://www.npmjs.com/package/websocket:
+``` javascript
+global.WebSocket = require('websocket').w3cwebsocket;
+var pomeloClient = require('pomelo-jsclient-websocket');
+``` 
+- Include pomelo-wsclient.js file in browser environments is enough, as it defines window.pomeloClient.
 
 ### connect to the server
 ``` javascript
-  pomelo.init(params, callback);
+  var pomelo = new pomeloClient();
+  pomelo.init(params[, callback]); // returns a promise
 ```  
-params object are 
-
 example:
 ``` javascript
+  var pomelo = new pomeloClient();
   pomelo.init({
     host: host,
     port: port,
     user: {},
     handshakeCallback : function(){}
-  }, function() {
+  }).then(function() {
     console.log('success');
+  }).catch(function() {
+    console.log('error');
   });
 ```
 
@@ -35,16 +38,16 @@ handshakeCallback field is handshake callback function
 
 ### send request to server with callback
 ``` javascript
-  pomelo.request(route, msg, callback);
+  pomelo.request(route[, msg, callback]) // returns a promise;
 ```
 
 example:
 ``` javascript
-	pomelo.request(route, {
-		rid: rid
-	}, function(data) {
+  pomelo.request(route, {
+    rid: rid
+  }).then(function(data) {
     console.log(dta);	
-	});
+  });
 ```
 
 ### send request to server without callback

@@ -11,6 +11,7 @@ This pomelo client library is essentially identical to https://github.com/pomelo
 global.WebSocket = require('ws'); // https://www.npmjs.com/package/ws
 // or
 global.WebSocket = require('websocket').w3cwebsocket; // https://www.npmjs.com/package/websocket
+
 var pomeloClient = require('pomelo-jsclient-websocket');
 ``` 
 - Include pomelo-wsclient.js file in browser environments is enough, as it defines window.pomeloClient.
@@ -45,8 +46,12 @@ handshakeCallback field is handshake callback function
 
 example:
 ``` javascript
-  pomelo.request(route, {
-    rid: rid
+  var pomelo = new pomeloClient();
+  pomelo.init({
+    host: host,
+    port: port
+  }).then(function() {
+    return pomelo.request(route, {rid: rid});
   }).then(function(data) {
     console.log(dta);	
   });

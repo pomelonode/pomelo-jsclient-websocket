@@ -1,10 +1,10 @@
-#Pomelo javascript websocket client
+# Pomelo javascript websocket client
 
 The javascript websocket client library for [Pomelo](https://github.com/NetEase/pomelo).
 
 This pomelo client library is essentially identical to https://github.com/pomelonode/pomelo-jsclient-websocket, but some additional features to enable nodejs/browser compatibility and promises were added.
 
-##Usage
+## Usage
 ### 1. nodejs/browser setup
 - In order to setup this pomelo client with nodejs its necessary define a global.WebSocket, and WebSocket must follow the WebSockets API. Setup example:
 ``` javascript
@@ -80,14 +80,14 @@ example:
 pomelo.disconnect();
 ```  
 
-##Build
+## Build
 1. Install all dependencies:
 `npm install`
 
 2. Generate the bundle:
 `npm run build`
 
-##License
+## License
 (The MIT License)
 
 Copyright (c) 2012-2015 NetEase, Inc. and other contributors

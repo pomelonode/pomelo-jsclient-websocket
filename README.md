@@ -1,58 +1,68 @@
-#Pomelo javascript websocket client
+# Pomelo javascript websocket client
 
 The javascript websocket client library for [Pomelo](https://github.com/NetEase/pomelo).
 
-Since there are two kind connectors in pomelo 0.3, socket.io and socket(websocket), we provide two javascript clients for different usage.
-[websocket client](https://github.com/pomelonode/pomelo-jsclient-websocket) is optimized for data transfer size, the package is compressedin high rate. It's suitable for HTML5 online game, especially mobile platform.
+This pomelo client library is essentially identical to https://github.com/pomelonode/pomelo-jsclient-websocket, but some additional features to enable nodejs/browser compatibility and promises were added.
 
-[socket.io client](https://github.com/pomelonode/pomelo-jsclient-socket.io) is excellent for browser compatibility, the package is in json. It's suitable for online realtime application on browser, like chat, on which browser compatiblity is an important issue.
-
-The apis are almost the same in both clients, except websocket client need a handshake callback for protocol data.
-Both clients use [component](https://github.com/component/component/) package manager for building.
-
-##Usage
-
-### connect to the server
+## Usage
+### 1. nodejs/browser setup
+- In order to setup this pomelo client with nodejs its necessary define a global.WebSocket, and WebSocket must follow the WebSockets API. Setup example:
 ``` javascript
-  pomelo.init(params, callback);
-```  
-params object are 
+global.WebSocket = require('ws'); // https://www.npmjs.com/package/ws
+// or
+global.WebSocket = require('websocket').w3cwebsocket; // https://www.npmjs.com/package/websocket
 
+var pomeloClient = require('pomelo-jsclient-websocket');
+``` 
+- Include pomelo-wsclient.js file in browser environments is enough, as it defines window.pomeloClient.
+
+### 2. connect to the server
+``` javascript
+  var pomelo = new pomeloClient();
+  pomelo.init(params[, callback]); // returns a promise
+```  
 example:
 ``` javascript
+  var pomelo = new pomeloClient();
   pomelo.init({
     host: host,
     port: port,
     user: {},
     handshakeCallback : function(){}
-  }, function() {
+  }).then(function() {
     console.log('success');
+  }).catch(function() {
+    console.log('error');
   });
 ```
 
 user field is user define json content  
 handshakeCallback field is handshake callback function  
 
-### send request to server with callback
+### 3. send request to server with callback
 ``` javascript
-  pomelo.request(route, msg, callback);
+  pomelo.request(route[, msg, callback]) // returns a promise;
 ```
 
 example:
 ``` javascript
-	pomelo.request(route, {
-		rid: rid
-	}, function(data) {
+  var pomelo = new pomeloClient();
+  pomelo.init({
+    host: host,
+    port: port
+  }).then(function() {
+    return pomelo.request(route, {rid: rid});
+  }).then(function(data) {
     console.log(dta);	
-	});
+  });
 ```
 
-### send request to server without callback
+### 4. send request to server without callback
 ``` javascript
   pomelo.notify(route, params);
 ```
 
-### receive message from server 
+### 5. receive message from server 
 ``` javascript
   pomelo.on(route, callback); 
 ```
@@ -65,12 +75,19 @@ example:
 	});
 ```
 
-### disconnect from server  
+### 6. disconnect from server  
 ``` javascript
 pomelo.disconnect();
 ```  
 
-##License
+## Build
+1. Install all dependencies:
+`npm install`
+
+2. Generate the bundle:
+`npm run build`
+
+## License
 (The MIT License)
 
 Copyright (c) 2012-2015 NetEase, Inc. and other contributors
